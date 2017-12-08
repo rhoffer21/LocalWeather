@@ -1,0 +1,130 @@
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
+<script>
+
+    var globalVar;
+    var returnedWeather;
+    var returnedTemp;
+    var tempC;
+    var tempF;
+    var scale = "C";
+    var lat;
+    var lon;
+    var url;
+    var city;
+    var xhr = new XMLHttpRequest();
+   
+    
+    
+    
+    function processRequest(e) {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            globalVar = JSON.parse(xhr.responseText);
+            returnedWeather = globalVar.weather[0];
+            returnedTemp = Math.trunc(globalVar.main.temp * Math.pow(10, 0)) / Math.pow(10, 0);
+            
+            tempC = returnedTemp;
+            tempF = (returnedTemp * 1.8) + 32;
+            
+            city = globalVar.name;
+            
+            
+            showWeatherDescription();
+            showImage();
+            showTemp();
+            showCity();
+        }
+        
+    }
+    
+    function showWeatherDescription(){
+        document.getElementById('weatherDescription').innerHTML = returnedWeather.main;
+    }
+    
+    function showImage(){
+        document.getElementById('weatherImage').innerHTML = "<img src = '" + returnedWeather.icon + "'>";
+    }
+    
+    function showTemp(){
+        document.getElementById('temperature').innerHTML = returnedTemp;
+        document.getElementById('convert').innerHTML = scale;
+    }
+    
+    function showCity(){
+        document.getElementById('city').innerHTML = city;
+    }
+    
+    function convertTemp(){
+        if (scale == "C"){
+            scale = "F";
+            returnedTemp = tempF;
+            showTemp();
+        }else{
+            scale = "C";
+            returnedTemp = tempC;
+            showTemp();
+        }
+    }
+    
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        }
+    }
+    
+    function showPosition(position) {
+    lat = position.coords.latitude;
+    lon = position.coords.longitude;
+    url = "https://fcc-weather-api.glitch.me/api/current?lat=" + lat + "&lon=" + lon;
+    xhr.open('GET', url, true);
+    xhr.send();
+
+    xhr.onreadystatechange = processRequest;
+}
+
+
+</script>
+</head>
+<body onload ="getLocation()">
+<div class="container-fluid">
+    <div class="row text-center">
+        <div class="col-12">
+            <h2 class="display-4">Local Weather</h2>
+        </div>
+        <div class="col-12">
+            <p></p>
+        </div>
+        
+        <div class="col-12">
+            <span class="lead" id="temperature"></span>
+            <button class="btn btn-link pl-0 pt-0" id="convert" onclick="convertTemp()"></button>
+        </div>
+        
+        <div class="col-12">
+            <span class="lead" id="weatherDescription"></span>
+        </div>
+        
+        <div class="col-12">
+            <span class="lead" id="weatherImage"></span>
+        </div>
+        
+        <div class="col-12">
+            <span class="lead" id="city"></span>
+        </div>
+        
+    </div>
+</div>
+
+<!-- jQuery first, then Tether, then Bootstrap JS. -->
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+</body>
+</html>
